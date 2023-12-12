@@ -13,7 +13,7 @@ const App = () => {
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [largeImageURL, setLargeImageURL] = useState('');
-  const [totalPages, setTotalPages] = useState(0); // New state for total pages
+  const [totalPages, setTotalPages] = useState(0);
 
   const fetchImages = useCallback(async () => {
     const API_KEY = '9553753-ea4dda346b6c3bb2d3db6490b';
@@ -42,11 +42,11 @@ const App = () => {
 
       const data = await response.json();
       const totalHits = data.totalHits;
-      const pages = Math.ceil(totalHits / 12); // Calculate total pages
+      const pages = Math.ceil(totalHits / 12);
       setTotalPages(pages);
 
       setImages(prevImages => [...prevImages, ...data.hits]);
-      setCurrentPage(prevPage => prevPage + 1);
+    
     } catch (error) {
       setError(error.message);
     } finally {
@@ -64,12 +64,16 @@ const App = () => {
     setSearchQuery(query);
     setImages([]);
     setCurrentPage(1);
-    setTotalPages(0); // Reset total pages on new search
+    setTotalPages(0);
   };
 
   const toggleModal = (imageURL = '') => {
     setShowModal(!showModal);
     setLargeImageURL(imageURL);
+  };
+
+  const loadMore = () => {
+    setCurrentPage(currentPage => currentPage + 1);
   };
 
   return (
@@ -78,8 +82,8 @@ const App = () => {
       <ImageGallery images={images} onImageClick={toggleModal} />
 
       {isLoading && <Loader />}
-      {images.length > 0 && !isLoading && currentPage <= totalPages && (
-        <Button onClick={() => fetchImages()} />
+      {images.length > 0 && !isLoading && currentPage < totalPages && (
+        <Button onClick={loadMore}>Load More</Button>
       )}
       {showModal && (
         <Modal onClose={toggleModal}>
